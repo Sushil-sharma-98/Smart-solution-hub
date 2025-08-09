@@ -1,0 +1,2293 @@
+index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smart Solution Hub - Loan Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #5c4dcc;
+            --primary-light: #7d6ce8;
+            --primary-dark: #4a3cb0;
+            --secondary: #00a8a5;
+            --secondary-dark: #008784;
+            --accent: #e84393;
+            --accent-dark: #d63068;
+            --success: #00a854;
+            --success-light: #e6f7ef;
+            --warning: #f5b349;
+            --warning-light: #fff8e6;
+            --error: #c0392b;
+            --error-light: #fdecea;
+            --info: #1a73e8;
+            --info-light: #e8f0fe;
+            --bg: #f5f6fa;
+            --card-bg: #ffffff;
+            --text: #2d3436;
+            --text-light: #636e72;
+            --border: #dfe6e9;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --highlight: #f1f3ff;
+            --msme-color: #1a73e8;
+            --jlg-color: #00a854;
+            --il-color: #5c4dcc;
+            --il-color-1: #6a5acd;
+            --il-color-2: #9370db;
+            --il-color-3: #8a2be2;
+            --il-color-4: #9932cc;
+        }
+        * {
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 10px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 10px;
+        }
+        .app-header {
+            text-align: center;
+            margin-bottom: 15px;
+            width: 100%;
+            padding: 0 5px;
+        }
+        .app-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        .app-logo {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(92, 77, 204, 0.2);
+        }
+        .app-logo::before {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            background: white;
+            opacity: 0.3;
+            transform: rotate(45deg);
+        }
+        .app-logo::after {
+            content: "";
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+            background: white;
+            opacity: 0.5;
+            bottom: 6px;
+            right: 6px;
+        }
+        .current-date {
+            font-size: 14px;
+            color: var(--text);
+            font-weight: 500;
+        }
+        .calculator-card {
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 15px;
+        }
+        .tabs {
+            display: flex;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            position: relative;
+        }
+        .tab {
+            padding: 15px 0;
+            flex: 1;
+            text-align: center;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            user-select: none;
+        }
+        .tab.active {
+            color: white;
+            font-weight: 600;
+            background: rgba(0,0,0,0.1);
+        }
+        .tab[data-tab="jlg"] {
+            background: var(--jlg-color);
+        }
+        .tab[data-tab="il"] {
+            background: linear-gradient(135deg, var(--il-color-1), var(--il-color-3));
+        }
+        .tab[data-tab="msme"] {
+            background: var(--msme-color);
+        }
+        .form-container {
+            padding: 20px 15px;
+            display: none;
+        }
+        .form-container.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text);
+            position: relative;
+            padding-left: 12px;
+        }
+        .form-label:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 6px;
+            width: 5px;
+            height: 5px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background-color: white;
+            color: var(--text);
+            font-weight: 500;
+        }
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px var(--highlight);
+        }
+        .range-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e0e0e0;
+            margin: 12px 0;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .range-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(92, 77, 204, 0.5);
+        }
+        .radio-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .radio-label {
+            display: block;
+            padding: 12px 8px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+            flex: 1;
+            min-width: 100px;
+        }
+        input[type="radio"] {
+            display: none;
+        }
+        input[type="radio"]:checked + .radio-label {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(92, 77, 204, 0.3);
+        }
+        .select-wrapper {
+            position: relative;
+        }
+        .select-wrapper:after {
+            content: '▼';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            font-size: 12px;
+            pointer-events: none;
+        }
+        .btn {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(232, 67, 147, 0.3);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(232, 67, 147, 0.4);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .btn-compare {
+            background: linear-gradient(135deg, #ff6b6b, #ff4757);
+            margin-top: 10px;
+        }
+        .result-card {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            display: none;
+            animation: fadeIn 0.4s ease;
+            border: 1px solid var(--primary-light);
+        }
+        .result-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            font-size: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed var(--border);
+            flex-wrap: wrap;
+        }
+        .result-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .result-label {
+            color: var(--text);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 10px;
+        }
+        .result-value {
+            font-weight: 600;
+            color: var(--text);
+            white-space: nowrap;
+        }
+        .emi-section {
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-dark));
+            color: white;
+            padding: 16px;
+            border-radius: 10px;
+            margin-top: 15px;
+            box-shadow: 0 5px 15px rgba(0, 168, 132, 0.3);
+        }
+        .emi-label {
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .emi-value {
+            font-size: 22px;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+        .error {
+            color: var(--error);
+            font-size: 13px;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+        .total-deductions {
+            background: var(--highlight);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 12px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 3px 10px rgba(92, 77, 204, 0.1);
+        }
+        .total-deductions .result-row {
+            border-bottom: none;
+            margin-bottom: 6px;
+        }
+        .total-deductions .result-value {
+            color: var(--primary-dark);
+        }
+        .app-footer {
+            text-align: center;
+            width: 100%;
+            font-size: 12px;
+            color: var(--text);
+            padding: 12px 0;
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .developer-name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .copyright {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+        .fixed-value {
+            background-color: #f5f5f5;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+            color: var(--text);
+        }
+        .state-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 12px;
+        }
+        .state-btn {
+            padding: 8px 10px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+            font-weight: 500;
+            flex: 1;
+            min-width: 80px;
+        }
+        .state-btn.selected {
+            background: var(--il-color-4);
+            color: white;
+            border-color: var(--il-color-4);
+            box-shadow: 0 3px 10px rgba(154, 50, 205, 0.3);
+        }
+        .stamp-duty-edit {
+            display: none;
+            margin-top: 8px;
+        }
+        .stamp-duty-edit input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .hoshpi-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        .hoshpi-label {
+            display: block;
+            padding: 12px 6px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 80px;
+        }
+        input[type="radio"]:checked + .hoshpi-label {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+            box-shadow: 0 5px 15px rgba(0, 168, 84, 0.3);
+        }
+        .info-tooltip {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 12px;
+            line-height: 18px;
+            margin-left: 4px;
+            cursor: help;
+            position: relative;
+        }
+        .info-tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            font-weight: normal;
+        }
+        .info-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        .coming-soon {
+            text-align: center;
+            padding: 25px;
+            color: var(--text);
+            font-weight: 500;
+        }
+        .contact-dev {
+            margin-top: 15px;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            font-size: 14px;
+        }
+        .disclaimer {
+            font-size: 10px;
+            color: var(--text-light);
+            margin-top: 10px;
+            text-align: center;
+            padding: 0 10px;
+        }
+        .credit-section {
+            background: linear-gradient(135deg, #00a854, #00874d);
+            color: white;
+            padding: 16px;
+            border-radius: 10px;
+            margin-top: 12px;
+            box-shadow: 0 5px 15px rgba(0, 168, 84, 0.3);
+        }
+        .system-emi-section {
+            background: linear-gradient(135deg, var(--il-color-2), var(--il-color-4));
+            color: white;
+            padding: 16px;
+            border-radius: 10px;
+            margin-top: 12px;
+            box-shadow: 0 5px 15px rgba(154, 50, 205, 0.3);
+        }
+        .file-charges {
+            background: #f1f3ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 12px;
+            border-left: 4px solid var(--primary-light);
+        }
+        .insurance-details {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 3px solid var(--success);
+        }
+        .insurance-details .result-row {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            font-size: 13px;
+        }
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 13px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .schedule-table th {
+            background-color: var(--primary);
+            color: white;
+            padding: 10px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .schedule-table td {
+            padding: 8px;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+            font-size: 12px;
+        }
+        .schedule-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .schedule-table tr:hover {
+            background-color: var(--highlight);
+        }
+        .schedule-table .emi-highlight {
+            background-color: rgba(0, 168, 132, 0.1);
+            font-weight: 600;
+        }
+        .schedule-table .date-cell {
+            color: var(--primary-dark);
+            font-weight: 500;
+        }
+        .schedule-table .day-cell {
+            color: var(--secondary-dark);
+            font-weight: 500;
+        }
+        .schedule-table .balance-cell {
+            color: var(--error);
+            font-weight: 600;
+        }
+        .schedule-table .principal-cell {
+            color: var(--success);
+        }
+        .schedule-table .interest-cell {
+            color: var(--warning);
+        }
+        .schedule-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+        .thank-you {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            color: white;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        .thank-you h3 {
+            margin-bottom: 10px;
+        }
+        .collection-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .collection-option {
+            flex: 1;
+            min-width: 0;
+        }
+        .collection-option select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .msme-form-group {
+            margin-bottom: 20px;
+        }
+        .msme-loan-types {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .msme-loan-type {
+            display: block;
+            padding: 12px 8px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+            flex: 1;
+            min-width: 100px;
+        }
+        input[type="radio"]:checked + .msme-loan-type {
+            background: var(--msme-color);
+            color: white;
+            border-color: var(--msme-color);
+            box-shadow: 0 5px 15px rgba(26, 115, 232, 0.3);
+        }
+        .msme-emi-breakup {
+            background: var(--info-light);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 12px;
+            border-left: 4px solid var(--msme-color);
+        }
+        .chart-container {
+            margin-top: 20px;
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        .compare-section {
+            display: none;
+            margin-top: 30px;
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        .compare-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .compare-charts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .compare-chart-container {
+            flex: 1;
+            min-width: 300px;
+            height: 300px;
+        }
+        .compare-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        .compare-table th {
+            background-color: var(--primary);
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        .compare-table td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        .compare-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .jlg-highlight {
+            background-color: rgba(0, 168, 84, 0.1);
+        }
+        .il-highlight {
+            background-color: rgba(92, 77, 204, 0.1);
+        }
+        .better-option {
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        /* New styles for MSME under development message */
+        .msme-coming-soon {
+            text-align: center;
+            padding: 30px;
+            color: var(--text);
+            font-weight: 500;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin: 20px 0;
+        }
+
+        .msme-coming-soon i {
+            font-size: 24px;
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .msme-contact-dev {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+            font-size: 15px;
+            text-align: left;
+        }
+
+        .msme-contact-dev i {
+            color: var(--primary);
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+                font-size: 15px;
+            }
+            .app-container {
+                padding: 0 8px;
+            }
+            .app-title {
+                font-size: 20px;
+            }
+            .calculator-card {
+                border-radius: 14px;
+            }
+            .form-container {
+                padding: 15px 12px;
+            }
+            .form-control {
+                padding: 12px 14px;
+                font-size: 14px;
+            }
+            .fixed-value {
+                padding: 12px 14px;
+                font-size: 14px;
+            }
+            .btn {
+                padding: 14px;
+                font-size: 15px;
+            }
+            .result-card {
+                padding: 16px;
+            }
+            .emi-value {
+                font-size: 20px;
+            }
+            .schedule-table {
+                font-size: 11px;
+            }
+            .schedule-table th, 
+            .schedule-table td {
+                padding: 6px 4px;
+            }
+            .compare-chart-container {
+                min-width: 100%;
+            }
+            .msme-coming-soon {
+                padding: 20px;
+            }
+            .msme-contact-dev {
+                padding: 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <div class="app-header">
+            <div class="app-title">
+                <div class="app-logo"></div>
+                Smart Solution Hub
+            </div>
+            <div class="current-date" id="current-date"></div>
+        </div>
+        
+        <div class="calculator-card">
+            <div class="tabs">
+                <div class="tab active" data-tab="jlg">JLG</div>
+                <div class="tab" data-tab="il">IL</div>
+                <div class="tab" data-tab="msme">MSME</div>
+            </div>
+
+            <!-- JLG Calculator -->
+            <div class="form-container active" id="jlg-calculator">
+                <div class="form-group">
+                    <label class="form-label">Loan Amount
+                        <span class="info-tooltip">?
+                            <span class="tooltip-text">Enter the loan amount between ₹1,000 to ₹1,50,000</span>
+                        </span>
+                    </label>
+                    <input type="number" class="form-control" id="loan-amount" min="1000" max="150000" value="50000" step="1000">
+                    <input type="range" class="range-slider" id="loan-amount-slider" min="1000" max="150000" value="50000" step="1000">
+                    <div id="amount-error" class="error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Loan Tenure
+                        <span class="info-tooltip">?
+                            <span class="tooltip-text">Select loan repayment period (12, 24, or 36 months)</span>
+                        </span>
+                    </label>
+                    <div class="radio-group">
+                        <div>
+                            <input type="radio" id="tenure-12" name="tenure" value="12">
+                            <label for="tenure-12" class="radio-label">12 Months</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="tenure-24" name="tenure" value="24" checked>
+                            <label for="tenure-24" class="radio-label">24 Months</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="tenure-36" name="tenure" value="36">
+                            <label for="tenure-36" class="radio-label">36 Months</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Cycle Type
+                        <span class="info-tooltip">?
+                            <span class="tooltip-text">Select if this is the first loan or subsequent loan</span>
+                        </span>
+                    </label>
+                    <div class="select-wrapper">
+                        <select class="form-control" id="cycle-type">
+                            <option value="first">1st Cycle</option>
+                            <option value="subsequent">Subsequent Cycle</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Interest Rate (%)
+                        <span class="info-tooltip">?
+                            <span class="tooltip-text">Enter the annual interest rate percentage</span>
+                        </span>
+                    </label>
+                    <input type="number" class="form-control" id="interest-rate" value="12" step="0.1">
+                    <div id="interest-error" class="error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Collection Schedule
+                        <span class="info-tooltip">?
+                            <span class="tooltip-text">Select which week and day of the month for repayments</span>
+                        </span>
+                    </label>
+                    <div class="collection-options">
+                        <div class="collection-option">
+                            <select class="form-control" id="collection-week">
+                                <option value="1">Week 1</option>
+                                <option value="2">Week 2</option>
+                                <option value="3">Week 3</option>
+                                <option value="4">Week 4</option>
+                                <option value="5">Week 5</option>
+                            </select>
+                        </div>
+                        <div class="collection-option">
+                            <select class="form-control" id="collection-day">
+                                <option value="1">Monday</option>
+                                <option value="2">Tuesday</option>
+                                <option value="3">Wednesday</option>
+                                <option value="4">Thursday</option>
+                                <option value="5">Friday</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Insurance Plan
+                        <span class="info-tooltip">?
+                            <span class="tooltip-text">Optional insurance plan for loan protection</span>
+                        </span>
+                    </label>
+                    <div class="hoshpi-options">
+                        <div>
+                            <input type="radio" id="hoshpi-none" name="hoshpi" value="0" checked>
+                            <label for="hoshpi-none" class="hoshpi-label">No Plan</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="hoshpi-1yr" name="hoshpi" value="990">
+                            <label for="hoshpi-1yr" class="hoshpi-label">1 Year ₹990</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="hoshpi-2yr" name="hoshpi" value="1690">
+                            <label for="hoshpi-2yr" class="hoshpi-label">2 Years ₹1,690</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn" id="calculate-btn">
+                    <i class="fas fa-calculator"></i> CALCULATE EMI
+                </button>
+
+                <button class="btn btn-compare" id="compare-jlg-btn" style="display: none;">
+                    <i class="fas fa-exchange-alt"></i> COMPARE WITH IL
+                </button>
+
+                <div id="result-section" class="result-card">
+                    <div class="result-title">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        LOAN SUMMARY
+                    </div>
+                    
+                    <div class="result-row">
+                        <span class="result-label">Principal Amount:</span>
+                        <span class="result-value" id="result-principal">₹50,000</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Total Interest:</span>
+                        <span class="result-value" id="result-interest">₹6,000</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Processing Fee:</span>
+                        <span class="result-value" id="result-processing-fee">₹750</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">GST (18%):</span>
+                        <span class="result-value" id="result-gst">₹135</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Insurance:</span>
+                        <span class="result-value" id="result-insurance">₹2,000</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Netcat Charges:</span>
+                        <span class="result-value" id="result-netcat">₹380</span>
+                    </div>
+                    <div class="result-row" id="result-hoshpicash-row" style="display:none;">
+                        <span class="result-label">Insurance Plan:</span>
+                        <span class="result-value" id="result-hoshpicash">₹1,690</span>
+                    </div>
+                    
+                    <div class="total-deductions">
+                        <div class="result-row">
+                            <span class="result-label">Total Deductions:</span>
+                            <span class="result-value" id="result-total-deductions">₹3,265</span>
+                        </div>
+                    </div>
+                    
+                    <div class="emi-section">
+                        <div class="emi-label">System Rounded Monthly EMI</div>
+                        <div class="emi-value" id="result-system-emi">₹2,340</div>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="jlg-amortization-chart"></canvas>
+                    </div>
+
+                    <div class="payment-schedule" id="payment-schedule" style="margin-top: 20px;">
+                        <h3 style="margin-bottom: 15px; color: var(--primary);">Payment Schedule (System EMI)</h3>
+                        <div class="schedule-container">
+                            <table class="schedule-table" id="schedule-table">
+                                <thead>
+                                    <tr>
+                                        <th>S.No.</th>
+                                        <th>Date</th>
+                                        <th>Day</th>
+                                        <th>Principal</th>
+                                        <th>Interest</th>
+                                        <th>EMI</th>
+                                        <th>Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="schedule-body">
+                                    <!-- Payment schedule will be generated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="thank-you" id="thank-you">
+                        <h3>Thank You!</h3>
+                        <p>Your JLG loan calculation is complete. We appreciate you using our services.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IL Calculator -->
+            <div class="form-container" id="il-calculator">
+                <div class="form-group">
+                    <label class="form-label">Loan Amount (₹50,000 to ₹3,00,000)
+                        <span class="info-tooltip">?
+                            <span class="tooltip-text">Enter the loan amount between ₹50,000 to ₹3,00,000</span>
+                        </span>
+                    </label>
+                    <input type="number" class="form-control" id="il-loan-amount" min="50000" max="300000" value="100000" step="1000">
+                    <input type="range" class="range-slider" id="il-loan-amount-slider" min="50000" max="300000" value="100000" step="1000">
+                    <div id="il-amount-error" class="error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Netoff Amount (₹)
+                        <span class="info-tooltip">?
+                            <span class="tooltip-text">Enter any amount to be deducted upfront from the loan</span>
+                        </span>
+                    </label>
+                    <input type="number" class="form-control" id="il-netoff-amount" min="0" value="0" step="1000">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Actual Loan Amount
+                        <span class="info-tooltip">?
+                            <span class="tooltip-text">This is the loan amount after deducting netoff amount</span>
+                        </span>
+                    </label>
+                    <div class="fixed-value" id="il-actual-loan-amount">₹1,00,000</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Customer Score (0-100)
+                        <span class="info-tooltip">?
+                            <span class="tooltip-text">Enter customer credit score (optional) for automatic interest rate calculation</span>
+                        </span>
+                    </label>
+                    <input type="number" class="form-control" id="il-customer-score" min="0" max="100" placeholder="Enter score (optional)">
+                    <div class="radio-group" style="margin-top: 10px;">
+                        <div>
+                            <input type="radio" id="score-auto" name="score-type" value="auto" checked>
+                            <label for="score-auto" class="radio-label">Auto Interest Rate</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="score-manual" name="score-type" value="manual">
+                            <label for="score-manual" class="radio-label">Manual Interest Rate</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="il-interest-rate-group">
+                    <label class="form-label">Interest Rate (%)
+                        <span class="info-tooltip">?
+                            <span class="tooltip-text">Annual interest rate percentage (auto-calculated based on score or manually entered)</span>
+                        </span>
+                    </label>
+                    <input type="number" class="form-control" id="il-interest-rate" value="24" step="0.1" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Loan Tenure
+                        <span class="info-tooltip">?
+                            <span class="tooltip-text">Select loan repayment period (24 or 36 months)</span>
+                        </span>
+                    </label>
+                    <div class="radio-group">
+                        <div>
+                            <input type="radio" id="il-tenure-24" name="il-tenure" value="24" checked>
+                            <label for="il-tenure-24" class="radio-label">24 Months</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="il-tenure-36" name="il-tenure" value="36">
+                            <label for="il-tenure-36" class="radio-label">36 Months</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Processing Fees (2%)
+                        <span class="info-tooltip">?
+                            <span class="tooltip-text">2% of the actual loan amount</span>
+                        </span>
+                    </label>
+                    <div class="fixed-value" id="il-processing-fee">₹2,000</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">GST (18%)
+                        <span class="info-tooltip">?
+                            <span class="tooltip-text">18% of the processing fee</span>
+                        </span>
+                    </label>
+                    <div class="fixed-value" id="il-gst">₹360</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">NetCat Charges
+                        <span class="info-tooltip">?
+                            <span class="tooltip-text">Fixed charges based on loan tenure</span>
+                        </span>
+                    </label>
+                    <div class="fixed-value" id="il-netcat">₹380</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Insurance
+                        <span class="info-tooltip">?
+                            <span class="tooltip-text">Insurance amount based on loan amount and tenure</span>
+                        </span>
+                    </label>
+                    <div class="fixed-value" id="il-insurance">₹1,600</div>
+                    <div class="insurance-details" id="il-insurance-details">
+                        <div class="result-row">
+                            <span class="result-label">Premium Rate:</span>
+                            <span class="result-value" id="il-insurance-rate">₹16 per ₹1000</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Base Premium:</span>
+                            <span class="result-value" id="il-base-premium">₹1,600</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">GST (18%):</span>
+                            <span class="result-value" id="il-insurance-gst">₹0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">State for Stamp Duty
+                        <span class="info-tooltip">?
+                            <span class="tooltip-text">Select state to calculate applicable stamp duty charges</span>
+                        </span>
+                    </label>
+                    <div class="state-selector">
+                        <div class="state-btn" data-state="punjab">Punjab</div>
+                        <div class="state-btn" data-state="haryana">Haryana</div>
+                        <div class="state-btn selected" data-state="other">Other</div>
+                    </div>
+                    <div class="stamp-duty-edit" id="stamp-duty-edit">
+                        <input type="number" id="il-stamp-duty-input" placeholder="Enter stamp duty amount" value="0">
+                    </div>
+                    <div class="fixed-value" id="il-stamp-duty">₹0</div>
+                </div>
+
+                <button class="btn" id="il-calculate-btn">
+                    <i class="fas fa-calculator"></i> CALCULATE EMI
+                </button>
+
+                <button class="btn btn-compare" id="compare-il-btn" style="display: none;">
+                    <i class="fas fa-exchange-alt"></i> COMPARE WITH JLG
+                </button>
+
+                <div id="il-result-section" class="result-card">
+                    <div class="result-title">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        LOAN SUMMARY
+                    </div>
+                    
+                    <div class="result-row">
+                        <span class="result-label">Loan Amount:</span>
+                        <span class="result-value" id="il-result-principal">₹1,00,000</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Netoff Amount:</span>
+                        <span class="result-value" id="il-result-netoff">₹0</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Actual Loan Amount:</span>
+                        <span class="result-value" id="il-result-actual">₹1,00,000</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Tenure:</span>
+                        <span class="result-value" id="il-result-tenure">24 Months</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Customer Score:</span>
+                        <span class="result-value" id="il-result-score">Not Provided</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Interest Rate:</span>
+                        <span class="result-value" id="il-result-interest-rate">24%</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Total Interest:</span>
+                        <span class="result-value" id="il-result-interest">₹24,000</span>
+                    </div>
+                    
+                    <div class="file-charges">
+                        <div class="result-row">
+                            <span class="result-label">Processing Fee (2%):</span>
+                            <span class="result-value" id="il-result-processing-fee">₹2,000</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">GST (18%):</span>
+                            <span class="result-value" id="il-result-gst">₹360</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">NetCat Charges:</span>
+                            <span class="result-value" id="il-result-netcat">₹380</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Insurance:</span>
+                            <span class="result-value" id="il-result-insurance">₹1,600</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Stamp Duty:</span>
+                            <span class="result-value" id="il-result-stamp-duty">₹0</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Total File Charges:</span>
+                            <span class="result-value" id="il-result-file-charges">₹4,340</span>
+                        </div>
+                    </div>
+                    
+                    <div class="total-deductions">
+                        <div class="result-row">
+                            <span class="result-label">Total Deductions:</span>
+                            <span class="result-value" id="il-result-total-deductions">₹4,340</span>
+                        </div>
+                    </div>
+                    
+                    <div class="credit-section">
+                        <div class="emi-label">Total Credit in Account</div>
+                        <div class="emi-value" id="il-result-credit">₹95,660</div>
+                    </div>
+                    
+                    <div class="system-emi-section">
+                        <div class="emi-label">System Monthly EMI</div>
+                        <div class="emi-value" id="il-result-system-emi">₹5,170</div>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="il-amortization-chart"></canvas>
+                    </div>
+
+                    <div class="payment-schedule" id="il-payment-schedule" style="margin-top: 20px;">
+                        <h3 style="margin-bottom: 15px; color: var(--primary);">Repayment Schedule (System EMI)</h3>
+                        <div class="schedule-container">
+                            <table class="schedule-table" id="il-schedule-table">
+                                <thead>
+                                    <tr>
+                                        <th>S.No.</th>
+                                        <th>Date</th>
+                                        <th>Day</th>
+                                        <th>Principal</th>
+                                        <th>Interest</th>
+                                        <th>EMI</th>
+                                        <th>Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="il-schedule-body">
+                                    <!-- Payment schedule will be generated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="thank-you" id="il-thank-you">
+                        <h3>Thank You!</h3>
+                        <p>Your Individual Loan calculation is complete. We appreciate you using our services.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MSME Calculator (Under Development) -->
+            <div class="form-container" id="msme-calculator">
+                <div class="msme-coming-soon">
+                    <h3 style="color: var(--primary); margin-bottom: 10px;">
+                        <i class="fas fa-tools"></i> MSME Calculator Under Development
+                    </h3>
+                    <p>This feature is currently not available for use.</p>
+                    <p>The MSME calculator is still under development.</p>
+                    
+                    <div class="msme-contact-dev">
+                        <p><strong>Developer: Sushil Sharma</strong></p>
+                        <p>For any questions or queries, please contact the developer.</p>
+                        <p style="margin-top: 10px;">
+                            <i class="fas fa-envelope"></i> Email: smartsolutionhub98@gmail.com<br>
+                            <i class="fas fa-phone"></i> Phone: +91 9910130942
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Section -->
+        <div id="compare-section" class="compare-section">
+            <div class="compare-title">
+                <i class="fas fa-balance-scale"></i>
+                JLG vs IL COMPARISON REPORT
+            </div>
+            
+            <div class="compare-charts">
+                <div class="compare-chart-container">
+                    <canvas id="compare-emi-chart"></canvas>
+                </div>
+                <div class="compare-chart-container">
+                    <canvas id="compare-deductions-chart"></canvas>
+                </div>
+            </div>
+            
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>JLG Loan</th>
+                        <th>IL Loan</th>
+                        <th>Difference</th>
+                    </tr>
+                </thead>
+                <tbody id="compare-table-body">
+                    <!-- Comparison data will be generated here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="app-footer">
+            <div>Developed by <span class="developer-name">Sushil Sharma</span></div>
+            <div class="copyright">Smart Solution Hub &copy; 2025. All Rights Reserved.</div>
+            <div class="disclaimer">This app and calculator are not affiliated with any bank or financial company. It's just a calculator for estimation purposes only.</div>
+        </div>
+    </div>
+
+    <script>
+        // Update current date and day
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', options);
+        }
+        
+        // Initialize date and update every minute
+        updateCurrentDate();
+        setInterval(updateCurrentDate, 60000);
+
+        // Format currency
+        function formatCurrency(amount) {
+            return '₹' + amount.toLocaleString('en-IN', {maximumFractionDigits: 0});
+        }
+
+        // Calculate system EMI (round to nearest 10)
+        function calculateSystemEMI(emi) {
+            return Math.ceil(emi / 10) * 10;
+        }
+
+        // Tab Switching
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab');
+            const formContainers = document.querySelectorAll('.form-container');
+            
+            function switchTab(selectedTab) {
+                // Remove active class from all tabs
+                tabs.forEach(tab => tab.classList.remove('active'));
+                // Add active class to clicked tab
+                selectedTab.classList.add('active');
+                
+                // Hide all form containers
+                formContainers.forEach(container => {
+                    container.classList.remove('active');
+                    container.style.display = 'none';
+                });
+                
+                // Show the selected form container
+                const tabId = selectedTab.getAttribute('data-tab');
+                const activeForm = document.getElementById(`${tabId}-calculator`);
+                if (activeForm) {
+                    activeForm.classList.add('active');
+                    activeForm.style.display = 'block';
+                }
+            }
+            
+            // Add click event to all tabs
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    switchTab(this);
+                });
+            });
+            
+            // Activate the default tab (JLG)
+            switchTab(document.querySelector('.tab.active'));
+        });
+
+        // Store calculation results for comparison
+        let jlgCalculation = null;
+        let ilCalculation = null;
+
+        /* JLG Calculator Logic */
+        const jlgCalculateBtn = document.getElementById('calculate-btn');
+        const jlgResultSection = document.getElementById('result-section');
+        const compareJlgBtn = document.getElementById('compare-jlg-btn');
+        
+        // Sync slider with input for JLG
+        const jlgLoanAmountInput = document.getElementById('loan-amount');
+        const jlgLoanAmountSlider = document.getElementById('loan-amount-slider');
+        
+        jlgLoanAmountInput.addEventListener('input', function() {
+            jlgLoanAmountSlider.value = this.value;
+        });
+        
+        jlgLoanAmountSlider.addEventListener('input', function() {
+            jlgLoanAmountInput.value = this.value;
+        });
+
+        // Generate JLG payment schedule with flexible dates
+        function generateJLGPaymentSchedule(loanAmount, tenure, interestRate, systemEMI, startDate) {
+            const scheduleBody = document.getElementById('schedule-body');
+            scheduleBody.innerHTML = '';
+            
+            const collectionWeek = parseInt(document.getElementById('collection-week').value);
+            const collectionDay = parseInt(document.getElementById('collection-day').value);
+            
+            let balance = loanAmount;
+            const monthlyRate = interestRate / 12 / 100;
+            const today = new Date(startDate);
+            
+            // Prepare data for amortization chart
+            const amortizationData = {
+                labels: [],
+                principalData: [],
+                interestData: [],
+                balanceData: []
+            };
+            
+            for (let i = 1; i <= tenure; i++) {
+                const paymentDate = new Date(today);
+                paymentDate.setMonth(today.getMonth() + i);
+                
+                // Set to the selected week and day
+                paymentDate.setDate(1); // Start at beginning of month
+                
+                // Find the nth occurrence of the selected day in the month
+                let dayCount = 0;
+                let paymentDay = 0;
+                for (let d = 1; d <= 31; d++) {
+                    paymentDate.setDate(d);
+                    if (paymentDate.getDay() === (collectionDay % 7)) {
+                        dayCount++;
+                        if (dayCount === collectionWeek) {
+                            paymentDay = d;
+                            break;
+                        }
+                    }
+                    if (d === 31) {
+                        // If we didn't find the nth occurrence (like 5th Friday), use last occurrence
+                        paymentDay = d - 7;
+                        while (paymentDate.getDay() !== (collectionDay % 7)) {
+                            paymentDay--;
+                            paymentDate.setDate(paymentDay);
+                        }
+                    }
+                }
+                
+                paymentDate.setDate(paymentDay);
+                
+                // Skip weekends if necessary (though collection days are Mon-Fri)
+                if (paymentDate.getDay() === 0) { // Sunday
+                    paymentDate.setDate(paymentDate.getDate() - 2);
+                } else if (paymentDate.getDay() === 6) { // Saturday
+                    paymentDate.setDate(paymentDate.getDate() - 1);
+                }
+                
+                const interest = balance * monthlyRate;
+                let principal = systemEMI - interest;
+                
+                // For last installment, adjust principal to clear balance
+                if (i === tenure) {
+                    principal = balance;
+                }
+                
+                balance -= principal;
+                if (balance < 0) balance = 0;
+                
+                const dayName = paymentDate.toLocaleDateString('en-US', { weekday: 'long' });
+                const weekNames = ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'];
+                const weekName = weekNames[collectionWeek-1];
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${i}</td>
+                    <td class="date-cell">${paymentDate.toLocaleDateString('en-IN')}</td>
+                    <td class="day-cell">${dayName}</td>
+                    <td class="principal-cell">${formatCurrency(principal)}</td>
+                    <td class="interest-cell">${formatCurrency(interest)}</td>
+                    <td class="emi-highlight">${formatCurrency(systemEMI)}</td>
+                    <td class="balance-cell">${formatCurrency(balance)}</td>
+                `;
+                scheduleBody.appendChild(row);
+                
+                // Store data for chart
+                amortizationData.labels.push(`Month ${i}`);
+                amortizationData.principalData.push(principal);
+                amortizationData.interestData.push(interest);
+                amortizationData.balanceData.push(balance);
+            }
+            
+            // Create amortization chart
+            createAmortizationChart('jlg-amortization-chart', amortizationData);
+            
+            return amortizationData;
+        }
+
+        jlgCalculateBtn.addEventListener('click', function() {
+            // Get input values
+            const loanAmount = parseFloat(jlgLoanAmountInput.value);
+            const tenure = parseInt(document.querySelector('input[name="tenure"]:checked').value);
+            const interestRate = parseFloat(document.getElementById('interest-rate').value);
+            const cycleType = document.getElementById('cycle-type').value;
+            const hoshpiPlan = document.querySelector('input[name="hoshpi"]:checked').value;
+
+            // Validate inputs
+            if (isNaN(loanAmount) || loanAmount < 1000 || loanAmount > 150000) {
+                document.getElementById('amount-error').textContent = 'Amount must be between ₹1,000-₹1,50,000';
+                return;
+            } else {
+                document.getElementById('amount-error').textContent = '';
+            }
+
+            if (isNaN(interestRate)) {
+                document.getElementById('interest-error').textContent = 'Please enter interest rate';
+                return;
+            } else {
+                document.getElementById('interest-error').textContent = '';
+            }
+
+            // Calculate processing fee (1.5% for first, 1% for subsequent)
+            const processingPercentage = cycleType === 'first' ? 1.5 : 1;
+            const processingFee = loanAmount * processingPercentage / 100;
+            const gst = processingFee * 0.18;
+
+            // Calculate insurance based on tenure
+            let insurancePrice = 0;
+            if (tenure === 12) insurancePrice = 24;
+            else if (tenure === 24) insurancePrice = 40;
+            else if (tenure === 36) insurancePrice = 56;
+            const insurance = (loanAmount * insurancePrice) / 1000;
+
+            // Calculate netcat based on tenure
+            let netcat = 0;
+            if (tenure === 12) netcat = 350;
+            else if (tenure === 24) netcat = 380;
+            else if (tenure === 36) netcat = 420;
+
+            // Hoshpicash
+            let hoshpicash = parseFloat(hoshpiPlan);
+
+            // Calculate interest (monthly reducing balance)
+            const monthlyRate = interestRate / 12 / 100;
+            const emi = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, tenure) / 
+                       (Math.pow(1 + monthlyRate, tenure) - 1);
+            const totalInterest = (emi * tenure) - loanAmount;
+
+            // Calculate system EMI (rounded to nearest 10)
+            const systemEMI = calculateSystemEMI(emi);
+
+            // Calculate total deductions
+            const totalDeductions = processingFee + gst + insurance + netcat + hoshpicash;
+
+            // Update results
+            document.getElementById('result-principal').textContent = formatCurrency(loanAmount);
+            document.getElementById('result-interest').textContent = formatCurrency(totalInterest);
+            document.getElementById('result-processing-fee').textContent = formatCurrency(processingFee);
+            document.getElementById('result-gst').textContent = formatCurrency(gst);
+            document.getElementById('result-insurance').textContent = formatCurrency(insurance);
+            document.getElementById('result-netcat').textContent = formatCurrency(netcat);
+            document.getElementById('result-system-emi').textContent = formatCurrency(systemEMI);
+            document.getElementById('result-total-deductions').textContent = formatCurrency(totalDeductions);
+
+            if (hoshpicash > 0) {
+                document.getElementById('result-hoshpicash-row').style.display = 'flex';
+                document.getElementById('result-hoshpicash').textContent = formatCurrency(hoshpicash);
+            } else {
+                document.getElementById('result-hoshpicash-row').style.display = 'none';
+            }
+
+            // Generate payment schedule
+            generateJLGPaymentSchedule(loanAmount, tenure, interestRate, systemEMI, new Date());
+
+            // Show thank you message
+            document.getElementById('thank-you').style.display = 'block';
+
+            // Show results
+            jlgResultSection.style.display = 'block';
+
+            // Store calculation for comparison
+            jlgCalculation = {
+                loanAmount,
+                tenure,
+                interestRate,
+                systemEMI,
+                totalInterest,
+                processingFee,
+                gst,
+                insurance,
+                netcat,
+                hoshpicash,
+                totalDeductions,
+                type: 'JLG'
+            };
+
+            // Show compare button if amount is within IL range (50k-3L)
+            if (loanAmount >= 50000 && loanAmount <= 300000) {
+                compareJlgBtn.style.display = 'block';
+            } else {
+                compareJlgBtn.style.display = 'none';
+            }
+        });
+
+        /* IL Calculator Logic */
+        const ilCalculateBtn = document.getElementById('il-calculate-btn');
+        const ilResultSection = document.getElementById('il-result-section');
+        const compareIlBtn = document.getElementById('compare-il-btn');
+        
+        // Sync slider with input for IL
+        const ilLoanAmountInput = document.getElementById('il-loan-amount');
+        const ilLoanAmountSlider = document.getElementById('il-loan-amount-slider');
+        
+        ilLoanAmountInput.addEventListener('input', function() {
+            ilLoanAmountSlider.value = this.value;
+            updateFeesIL();
+            updateInsuranceIL();
+        });
+        
+        ilLoanAmountSlider.addEventListener('input', function() {
+            ilLoanAmountInput.value = this.value;
+            updateFeesIL();
+            updateInsuranceIL();
+        });
+
+        // Calculate actual loan amount for IL
+        function calculateActualLoanIL() {
+            const loanAmount = parseFloat(ilLoanAmountInput.value) || 0;
+            const netoffAmount = parseFloat(document.getElementById('il-netoff-amount').value) || 0;
+            const actualAmount = Math.max(0, loanAmount - netoffAmount);
+            document.getElementById('il-actual-loan-amount').textContent = formatCurrency(actualAmount);
+            return { loanAmount, actualAmount, netoffAmount };
+        }
+
+        // Update interest rate based on customer score for IL
+        function updateInterestRateIL() {
+            const scoreType = document.querySelector('input[name="score-type"]:checked').value;
+            const interestRateInput = document.getElementById('il-interest-rate');
+            
+            if (scoreType === 'auto') {
+                const customerScore = parseInt(document.getElementById('il-customer-score').value) || 0;
+                let interestRate = 25; // Default for no score
+                
+                if (customerScore >= 80) {
+                    interestRate = 23;
+                } else if (customerScore >= 60) {
+                    interestRate = 24;
+                } else if (customerScore >= 40) {
+                    interestRate = 25;
+                }
+                
+                interestRateInput.value = interestRate;
+                interestRateInput.disabled = true;
+            } else {
+                interestRateInput.disabled = false;
+            }
+        }
+
+        // Update processing fee and GST for IL
+        function updateFeesIL() {
+            const { actualAmount } = calculateActualLoanIL();
+            const processingFee = actualAmount * 0.02;
+            const gst = processingFee * 0.18;
+            
+            document.getElementById('il-processing-fee').textContent = formatCurrency(processingFee);
+            document.getElementById('il-gst').textContent = formatCurrency(gst);
+        }
+
+        // Update NetCat charges based on tenure for IL
+        function updateNetCatIL() {
+            const tenure = document.querySelector('input[name="il-tenure"]:checked').value;
+            const netcat = tenure === '24' ? 380 : 420;
+            document.getElementById('il-netcat').textContent = formatCurrency(netcat);
+        }
+
+        // Update life insurance based on tenure and loan amount (using loan amount, not actual amount) for IL
+        function updateInsuranceIL() {
+            const tenure = document.querySelector('input[name="il-tenure"]:checked').value;
+            const loanAmount = parseFloat(ilLoanAmountInput.value) || 0;
+            
+            // Determine the base rate based on loan amount and tenure
+            let ratePerThousand = 0;
+            let includeGST = false;
+            
+            if (loanAmount <= 200000) {
+                // For amounts up to ₹2 lakh
+                if (tenure === '12') ratePerThousand = 8;
+                else if (tenure === '24') ratePerThousand = 16;
+                else if (tenure === '36') ratePerThousand = 24;
+            } else {
+                // For amounts above ₹2 lakh
+                includeGST = true;
+                if (tenure === '12') ratePerThousand = 8.04;
+                else if (tenure === '24') ratePerThousand = 15.31;
+                else if (tenure === '36') ratePerThousand = 22.65;
+            }
+            
+            // Calculate base premium
+            const basePremium = (loanAmount / 1000) * ratePerThousand;
+            
+            // Calculate GST if applicable
+            const gst = includeGST ? basePremium * 0.18 : 0;
+            
+            // Total insurance for applicant + co-applicant (2 persons)
+            const totalInsurance = (basePremium * 2) + gst;
+            
+            // Update display
+            document.getElementById('il-insurance').textContent = formatCurrency(totalInsurance);
+            document.getElementById('il-insurance-rate').textContent = `₹${ratePerThousand} per ₹1000`;
+            document.getElementById('il-base-premium').textContent = formatCurrency(basePremium * 2);
+            document.getElementById('il-insurance-gst').textContent = formatCurrency(gst);
+            
+            // Show/hide GST row based on whether it applies
+            document.getElementById('il-insurance-gst').parentElement.style.display = includeGST ? 'flex' : 'none';
+            
+            return {
+                basePremium,
+                gst,
+                totalInsurance
+            };
+        }
+
+        // Update stamp duty based on state for IL
+        function updateStampDutyIL() {
+            const state = document.querySelector('.state-btn.selected').dataset.state;
+            let stampDuty = 0;
+            
+            if (state === 'punjab' || state === 'haryana') {
+                stampDuty = 200;
+                document.getElementById('stamp-duty-edit').style.display = 'none';
+                document.getElementById('il-stamp-duty-input').value = '200';
+            } else {
+                document.getElementById('stamp-duty-edit').style.display = 'block';
+                stampDuty = parseFloat(document.getElementById('il-stamp-duty-input').value) || 0;
+            }
+            
+            document.getElementById('il-stamp-duty').textContent = stampDuty > 0 ? formatCurrency(stampDuty) : 'Not Applicable';
+            return stampDuty;
+        }
+
+        // State selection for IL
+        document.querySelectorAll('.state-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                updateStampDutyIL();
+            });
+        });
+
+        // Generate IL payment schedule with 5th of month rule
+        function generateILPaymentSchedule(loanAmount, tenure, interestRate, systemEMI, startDate) {
+            const scheduleBody = document.getElementById('il-schedule-body');
+            scheduleBody.innerHTML = '';
+            
+            let balance = loanAmount;
+            const monthlyRate = interestRate / 12 / 100;
+            const today = new Date(startDate);
+            
+            // Prepare data for amortization chart
+            const amortizationData = {
+                labels: [],
+                principalData: [],
+                interestData: [],
+                balanceData: []
+            };
+            
+            // Determine first payment date (5th of next month or month after)
+            let firstPaymentDate = new Date(today);
+            
+            if (today.getDate() <= 20) {
+                // If loan date is 1-20, first payment is 5th of next month
+                firstPaymentDate.setMonth(today.getMonth() + 1);
+                firstPaymentDate.setDate(5);
+            } else {
+                // If loan date is 21-31, skip next month, payment is 5th of month after next
+                firstPaymentDate.setMonth(today.getMonth() + 2);
+                firstPaymentDate.setDate(5);
+            }
+            
+            // Adjust for weekends
+            if (firstPaymentDate.getDay() === 0) { // Sunday
+                firstPaymentDate.setDate(6); // Move to Monday
+            } else if (firstPaymentDate.getDay() === 6) { // Saturday
+                firstPaymentDate.setDate(7); // Move to Monday
+            }
+            
+            for (let i = 1; i <= tenure; i++) {
+                const paymentDate = new Date(firstPaymentDate);
+                paymentDate.setMonth(firstPaymentDate.getMonth() + (i - 1));
+                
+                const interest = balance * monthlyRate;
+                let principal = systemEMI - interest;
+                
+                // For last installment, adjust principal to clear balance
+                if (i === tenure) {
+                    principal = balance;
+                }
+                
+                balance -= principal;
+                if (balance < 0) balance = 0;
+                
+                const dayName = paymentDate.toLocaleDateString('en-US', { weekday: 'long' });
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${i}</td>
+                    <td class="date-cell">${paymentDate.toLocaleDateString('en-IN')}</td>
+                    <td class="day-cell">${dayName}</td>
+                    <td class="principal-cell">${formatCurrency(principal)}</td>
+                    <td class="interest-cell">${formatCurrency(interest)}</td>
+                    <td class="emi-highlight">${formatCurrency(systemEMI)}</td>
+                    <td class="balance-cell">${formatCurrency(balance)}</td>
+                `;
+                scheduleBody.appendChild(row);
+                
+                // Store data for chart
+                amortizationData.labels.push(`Month ${i}`);
+                amortizationData.principalData.push(principal);
+                amortizationData.interestData.push(interest);
+                amortizationData.balanceData.push(balance);
+            }
+            
+            // Create amortization chart
+            createAmortizationChart('il-amortization-chart', amortizationData);
+            
+            return amortizationData;
+        }
+
+        ilCalculateBtn.addEventListener('click', function() {
+            // Get input values
+            const { loanAmount, actualAmount, netoffAmount } = calculateActualLoanIL();
+            const tenure = parseInt(document.querySelector('input[name="il-tenure"]:checked').value);
+            const interestRate = parseFloat(document.getElementById('il-interest-rate').value);
+            const customerScore = document.getElementById('il-customer-score').value;
+            const processingFee = actualAmount * 0.02;
+            const gst = processingFee * 0.18;
+            const netcat = tenure === 24 ? 380 : 420;
+            const insuranceDetails = updateInsuranceIL();
+            const insurance = insuranceDetails.totalInsurance;
+            const stampDuty = updateStampDutyIL();
+
+            // Calculate file charges (stamp duty + life insurance + netcat + gst + processing fees)
+            const fileCharges = stampDuty + insurance + netcat + gst + processingFee;
+
+            // Total deductions (netoff + processing + gst + netcat + insurance + stamp duty)
+            const totalDeductions = netoffAmount + processingFee + gst + netcat + insurance + stampDuty;
+
+            // Total credit in account (loan amount - netoff - processing - gst - netcat - insurance - stamp duty)
+            const totalCredit = loanAmount - totalDeductions;
+
+            // Validate inputs
+            if (isNaN(loanAmount) || loanAmount < 50000 || loanAmount > 300000) {
+                document.getElementById('il-amount-error').textContent = 'Amount must be between ₹50,000-₹3,00,000';
+                return;
+            } else {
+                document.getElementById('il-amount-error').textContent = '';
+            }
+
+            if (isNaN(interestRate)) {
+                return;
+            }
+
+            // Calculate interest (monthly reducing balance) - using loan amount (not actual amount)
+            const monthlyRate = interestRate / 12 / 100;
+            const emi = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, tenure) / 
+                       (Math.pow(1 + monthlyRate, tenure) - 1);
+            const totalInterest = (emi * tenure) - loanAmount;
+
+            // Calculate system EMI (rounded to nearest 10)
+            const systemEMI = calculateSystemEMI(emi);
+
+            // Update results
+            document.getElementById('il-result-principal').textContent = formatCurrency(loanAmount);
+            document.getElementById('il-result-netoff').textContent = formatCurrency(netoffAmount);
+            document.getElementById('il-result-actual').textContent = formatCurrency(actualAmount);
+            document.getElementById('il-result-tenure').textContent = tenure + ' Months';
+            document.getElementById('il-result-score').textContent = customerScore || 'Not Provided';
+            document.getElementById('il-result-interest-rate').textContent = interestRate + '%';
+            document.getElementById('il-result-interest').textContent = formatCurrency(totalInterest);
+            document.getElementById('il-result-processing-fee').textContent = formatCurrency(processingFee);
+            document.getElementById('il-result-gst').textContent = formatCurrency(gst);
+            document.getElementById('il-result-netcat').textContent = formatCurrency(netcat);
+            document.getElementById('il-result-insurance').textContent = formatCurrency(insurance);
+            document.getElementById('il-result-stamp-duty').textContent = stampDuty > 0 ? formatCurrency(stampDuty) : 'Not Applicable';
+            document.getElementById('il-result-file-charges').textContent = formatCurrency(fileCharges);
+            document.getElementById('il-result-total-deductions').textContent = formatCurrency(totalDeductions);
+            document.getElementById('il-result-credit').textContent = formatCurrency(totalCredit);
+            document.getElementById('il-result-system-emi').textContent = formatCurrency(systemEMI);
+
+            // Generate payment schedule
+            generateILPaymentSchedule(loanAmount, tenure, interestRate, systemEMI, new Date());
+
+            // Show thank you message
+            document.getElementById('il-thank-you').style.display = 'block';
+
+            // Show results
+            ilResultSection.style.display = 'block';
+
+            // Store calculation for comparison
+            ilCalculation = {
+                loanAmount,
+                tenure,
+                interestRate,
+                systemEMI,
+                totalInterest,
+                processingFee,
+                gst,
+                insurance,
+                netcat,
+                stampDuty,
+                totalDeductions,
+                type: 'IL'
+            };
+
+            // Show compare button if amount is within JLG range (1k-1.5L)
+            if (loanAmount >= 1000 && loanAmount <= 150000) {
+                compareIlBtn.style.display = 'block';
+            } else {
+                compareIlBtn.style.display = 'none';
+            }
+        });
+
+        /* MSME Calculator Logic - Disabled */
+        // All MSME calculator functionality has been removed and replaced with the under development message
+
+        // Create amortization chart
+        function createAmortizationChart(chartId, data) {
+            const ctx = document.getElementById(chartId).getContext('2d');
+            
+            // Destroy previous chart if it exists
+            if (window[chartId + 'Chart']) {
+                window[chartId + 'Chart'].destroy();
+            }
+            
+            window[chartId + 'Chart'] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Principal',
+                            data: data.principalData,
+                            backgroundColor: 'rgba(0, 168, 84, 0.7)',
+                            borderColor: 'rgba(0, 168, 84, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Interest',
+                            data: data.interestData,
+                            backgroundColor: 'rgba(245, 179, 73, 0.7)',
+                            borderColor: 'rgba(245, 179, 73, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            stacked: true,
+                            title: {
+                                display: true,
+                                text: 'Month'
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            title: {
+                                display: true,
+                                text: 'Amount (₹)'
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Amortization Schedule',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ₹' + context.raw.toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Compare JLG and IL loans
+        function compareLoans() {
+            if (!jlgCalculation || !ilCalculation) return;
+            
+            const compareSection = document.getElementById('compare-section');
+            const compareTableBody = document.getElementById('compare-table-body');
+            
+            // Clear previous comparison
+            compareTableBody.innerHTML = '';
+            
+            // Calculate differences
+            const emiDifference = ilCalculation.systemEMI - jlgCalculation.systemEMI;
+            const interestDifference = ilCalculation.totalInterest - jlgCalculation.totalInterest;
+            const deductionsDifference = ilCalculation.totalDeductions - jlgCalculation.totalDeductions;
+            
+            // Add comparison rows
+            addComparisonRow(compareTableBody, 'Loan Type', 'JLG Loan', 'IL Loan', '');
+            addComparisonRow(compareTableBody, 'Loan Amount', formatCurrency(jlgCalculation.loanAmount), formatCurrency(ilCalculation.loanAmount), 'Same');
+            addComparisonRow(compareTableBody, 'Tenure', jlgCalculation.tenure + ' Months', ilCalculation.tenure + ' Months', (ilCalculation.tenure - jlgCalculation.tenure) + ' Months');
+            addComparisonRow(compareTableBody, 'Interest Rate', jlgCalculation.interestRate + '%', ilCalculation.interestRate + '%', (ilCalculation.interestRate - jlgCalculation.interestRate) + '%');
+            addComparisonRow(compareTableBody, 'Monthly EMI', formatCurrency(jlgCalculation.systemEMI), formatCurrency(ilCalculation.systemEMI), formatCurrency(emiDifference), true);
+            addComparisonRow(compareTableBody, 'Total Interest', formatCurrency(jlgCalculation.totalInterest), formatCurrency(ilCalculation.totalInterest), formatCurrency(interestDifference), true);
+            addComparisonRow(compareTableBody, 'Processing Fee', formatCurrency(jlgCalculation.processingFee), formatCurrency(ilCalculation.processingFee), formatCurrency(ilCalculation.processingFee - jlgCalculation.processingFee));
+            addComparisonRow(compareTableBody, 'Insurance', formatCurrency(jlgCalculation.insurance), formatCurrency(ilCalculation.insurance), formatCurrency(ilCalculation.insurance - jlgCalculation.insurance));
+            addComparisonRow(compareTableBody, 'Other Charges', formatCurrency(jlgCalculation.netcat), formatCurrency(ilCalculation.netcat + ilCalculation.stampDuty), formatCurrency((ilCalculation.netcat + ilCalculation.stampDuty) - jlgCalculation.netcat));
+            addComparisonRow(compareTableBody, 'Total Deductions', formatCurrency(jlgCalculation.totalDeductions), formatCurrency(ilCalculation.totalDeductions), formatCurrency(deductionsDifference), true);
+            
+            // Create comparison charts
+            createComparisonCharts();
+            
+            // Show comparison section
+            compareSection.style.display = 'block';
+            
+            // Scroll to comparison section
+            compareSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Add row to comparison table
+        function addComparisonRow(tableBody, label, jlgValue, ilValue, difference, highlight = false) {
+            const row = document.createElement('tr');
+            
+            if (highlight) {
+                // Highlight the better option (lower value is better)
+                const jlgNum = parseFloat(jlgValue.replace(/[^0-9.-]+/g,""));
+                const ilNum = parseFloat(ilValue.replace(/[^0-9.-]+/g,""));
+                
+                if (jlgNum < ilNum) {
+                    row.classList.add('jlg-highlight');
+                    difference = `<span class="better-option">${difference} (JLG better)</span>`;
+                } else if (ilNum < jlgNum) {
+                    row.classList.add('il-highlight');
+                    difference = `<span class="better-option">${difference} (IL better)</span>`;
+                }
+            }
+            
+            row.innerHTML = `
+                <td>${label}</td>
+                <td>${jlgValue}</td>
+                <td>${ilValue}</td>
+                <td>${difference}</td>
+            `;
+            tableBody.appendChild(row);
+        }
+        
+        // Create comparison charts
+        function createComparisonCharts() {
+            // EMI Comparison Chart
+            const emiCtx = document.getElementById('compare-emi-chart').getContext('2d');
+            if (window.compareEmiChart) {
+                window.compareEmiChart.destroy();
+            }
+            
+            window.compareEmiChart = new Chart(emiCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['JLG Loan', 'IL Loan'],
+                    datasets: [{
+                        label: 'Monthly EMI',
+                        data: [jlgCalculation.systemEMI, ilCalculation.systemEMI],
+                        backgroundColor: [
+                            'rgba(0, 168, 84, 0.7)',
+                            'rgba(92, 77, 204, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(0, 168, 84, 1)',
+                            'rgba(92, 77, 204, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Amount (₹)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Monthly EMI Comparison',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'EMI: ₹' + context.raw.toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Deductions Comparison Chart
+            const deductionsCtx = document.getElementById('compare-deductions-chart').getContext('2d');
+            if (window.compareDeductionsChart) {
+                window.compareDeductionsChart.destroy();
+            }
+            
+            window.compareDeductionsChart = new Chart(deductionsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Processing Fee', 'Insurance', 'Other Charges', 'Total Deductions'],
+                    datasets: [
+                        {
+                            label: 'JLG Loan',
+                            data: [
+                                jlgCalculation.processingFee,
+                                jlgCalculation.insurance,
+                                jlgCalculation.netcat,
+                                jlgCalculation.totalDeductions
+                            ],
+                            backgroundColor: 'rgba(0, 168, 84, 0.7)',
+                            borderColor: 'rgba(0, 168, 84, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'IL Loan',
+                            data: [
+                                ilCalculation.processingFee,
+                                ilCalculation.insurance,
+                                ilCalculation.netcat + ilCalculation.stampDuty,
+                                ilCalculation.totalDeductions
+                            ],
+                            backgroundColor: 'rgba(92, 77, 204, 0.7)',
+                            borderColor: 'rgba(92, 77, 204, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Amount (₹)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Deductions Comparison',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ₹' + context.raw.toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize form values
+        document.getElementById('il-netoff-amount').addEventListener('input', function() {
+            calculateActualLoanIL();
+            updateFeesIL();
+        });
+
+        document.getElementById('il-customer-score').addEventListener('input', function() {
+            updateInterestRateIL();
+        });
+
+        document.querySelectorAll('input[name="score-type"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                updateInterestRateIL();
+            });
+        });
+
+        document.querySelectorAll('input[name="il-tenure"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                updateNetCatIL();
+                updateInsuranceIL();
+            });
+        });
+
+        document.getElementById('il-stamp-duty-input').addEventListener('input', function() {
+            updateStampDutyIL();
+        });
+
+        // Initialize values
+        updateInterestRateIL();
+        updateFeesIL();
+        updateNetCatIL();
+        updateInsuranceIL();
+        updateStampDutyIL();
+
+        // Comparison button events
+        compareJlgBtn.addEventListener('click', function() {
+            compareLoans();
+        });
+
+        compareIlBtn.addEventListener('click', function() {
+            compareLoans();
+        });
+    </script>
+</body>
+</html>
